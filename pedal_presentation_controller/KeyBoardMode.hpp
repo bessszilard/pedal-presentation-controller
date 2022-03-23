@@ -21,6 +21,7 @@ public:
 
 private:
     int m_currentModeIndex;
+    int m_minNameLength;
     int m_bufferIndex;
     SingleMode m_modes[MAX_NUMB_MODES];
     bool m_validModes[MAX_NUMB_MODES];

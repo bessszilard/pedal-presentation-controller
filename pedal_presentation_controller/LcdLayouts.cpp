@@ -17,7 +17,7 @@ void LcdLayouts::selectKeyBoardMode(const String& p_firstLine)
     m_lcd.setCursor(0, 0);
     m_lcd.print(p_firstLine);
     m_lcd.setCursor(0, 1);
-    m_lcd.print("^^^^");
+    m_lcd.print("     ^^^^");
 }
 
 void LcdLayouts::defaultL(const String& p_mode, int p_pageId, bool p_wireless, const String& p_buttonText /*= ""*/)
