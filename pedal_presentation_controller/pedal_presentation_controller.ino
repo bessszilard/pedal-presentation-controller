@@ -16,10 +16,10 @@
   void setup()
   {
     encoder1Button.configure(ENCODER_1_BUTTON, BUTTON_LOGIC);
-    
     keyBoardMode.push_back(SingleMode{"Arrows", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW});
-    keyBoardMode.push_back(SingleMode{"Page DU", "Pg dw", KEY_PAGE_DOWN, "Pg up", KEY_PAGE_UP});
-    
+    keyBoardMode.push_back(SingleMode{"Pg-DU", "Pg dw", KEY_PAGE_DOWN, "Pg up", KEY_PAGE_UP});
+    keyBoardMode.push_back(SingleMode{"Nothing", "L_Pedal", -1, "R_Pedal", -1});
+
     lcd.init();
     lcd.backlight();
   }
@@ -34,32 +34,27 @@
     long newPosition = myEnc.read() / 4;
     if (newPosition != oldPosition)
     {
+      newPosition > oldPosition ? keyBoardMode.nextMode() : keyBoardMode.previoustMode();
+
       lcd.clear();
       lcd.setCursor(0, 0);
-      String posString = "Rot: " + String(newPosition);
-      lcd.print(posString);
-
-      keyBoardMode.push_back(SingleMode{"Page DU", "Pg dw", KEY_PAGE_DOWN, "Pg up", KEY_PAGE_UP});
+      lcd.print(keyBoardMode.currentModeListToString());
       lcd.setCursor(0, 1);
-      lcd.print(keyBoardMode.currentModeToString());
+      lcd.print("^^^^");
 
       oldPosition = newPosition;
     }
 
-    int state = encoder1Button.currentState();
-    if (state != lastState) 
-    {
-      lcd.setCursor(0, 1);
-      String btnString = "State: " + String(state);
-      lcd.print(btnString);
-      lastState = state;
-    }
-    
-
     if (encoder1Button.isPressed()) 
     {
-      myEnc.write(0);
-      String posString = "Rot: " + String(myEnc.read());
-      lcd.print(posString);
+      // 0 M:PG_DU  PG:1000  
+      // 1 W:OFF BT:PG_DW 
+
+      // myEnc.write(0);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("M:" + keyBoardMode.currentModeToString() + "  PG: 00");
+      lcd.setCursor(0, 1);
+      lcd.print("W:OFF BT:");
     }
   }

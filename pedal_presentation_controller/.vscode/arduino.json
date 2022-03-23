@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:micro",
+    "sketch": "pedal_presentation_controller.ino",
+    "port": "/dev/ttyACM0"
+}
