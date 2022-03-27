@@ -1,13 +1,16 @@
-#include "KeyBoardMode.hpp"
+#include "FeatureModes.hpp"
 
-KeyBoardMode::KeyBoardMode() : 
+FeatureModes::FeatureModes() : 
   m_currentModeIndex(0)
   , m_bufferIndex(0)
   , m_minNameLength(5)
 {
+  push_back(FeatureMode {"Wir-Off", FeatureActionEnum::WirelessOn});
+  push_back(FeatureMode {"Wir-On", FeatureActionEnum::WirelessOff});
+  push_back(FeatureMode {"Rst-pgNum", FeatureActionEnum::ResetPageId});
 }
 
-void KeyBoardMode::push_back(SingleMode p_newMode)
+void FeatureModes::push_back(FeatureMode p_newMode)
 {
     m_modes[m_bufferIndex] = p_newMode;
 
@@ -25,7 +28,7 @@ void KeyBoardMode::push_back(SingleMode p_newMode)
     }
 }
 
-String KeyBoardMode::currentModeListToString()
+String FeatureModes::currentModeListToString()
 {
   // 0123456789ABCDEF
   // ODE0 MODE1 MODE2
@@ -54,22 +57,12 @@ String KeyBoardMode::currentModeListToString()
 
 }
 
-String KeyBoardMode::currentModeToString()
+String FeatureModes::currentModeToString()
 {
   return m_modes[m_currentModeIndex].modeName;
 }
 
-String KeyBoardMode::currentLeftKeyToString()
-{
-  return m_modes[m_currentModeIndex].leftCharName;
-}
-
-String KeyBoardMode::currentRightKeyToString()
-{
-  return m_modes[m_currentModeIndex].rightCharName;
-}
-
-void KeyBoardMode::nextMode() 
+void FeatureModes::nextMode() 
 {
   m_currentModeIndex++;
   if (m_bufferIndex <= m_currentModeIndex) 
@@ -78,11 +71,21 @@ void KeyBoardMode::nextMode()
   }
 }
 
-void KeyBoardMode::previoustMode() 
+void FeatureModes::previoustMode() 
 {
   m_currentModeIndex--;
   if (m_currentModeIndex < 0) 
   {
     m_currentModeIndex = m_bufferIndex - 1;
   }
+}
+
+void FeatureModes::updateValues(bool& p_wirelessMode, int& p_pageId)
+{
+    switch(m_modes[m_currentModeIndex].action)
+    {
+      case FeatureActionEnum::WirelessOn:  p_wirelessMode = false; break;
+      case FeatureActionEnum::WirelessOff:  p_wirelessMode = true; break;
+      case FeatureActionEnum::ResetPageId:  p_pageId = 0; break;
+    }
 }

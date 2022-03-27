@@ -1,8 +1,8 @@
 TODOsz
 
-- [ ] KeyBoardMode.next()
-- [ ] KeyBoardMode.previous()
-- [ ] LCD layout
+- [X] KeyBoardMode.next()
+- [X] KeyBoardMode.previous()
+- [X] LCD layout
 
 ```
 - 0123456789ABCDEF
@@ -13,11 +13,13 @@ TODOsz
 0 Arrows Nothing
 1   ^         
 
-- 0123456789ABCDEF
-0 SAVED: Arrows
-1         
-
 ```
+- [ ] justReleased()
+- [ ] Save to EEPROM
+- [ ] Send characters
+- [ ] wireless
+        another encoder
+        SPI module
 
 - [ ] Design circuit
 - [ ] 

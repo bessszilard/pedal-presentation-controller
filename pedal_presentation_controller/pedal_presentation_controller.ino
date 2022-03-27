@@ -2,58 +2,121 @@
 #include "Button.hpp"
 #include "KeyBoardMode.hpp"
 #include "LcdLayouts.hpp"
-#include "Pinout.h"
+#include "FeatureModes.hpp"
+#include "Defines.h"
 
 #include "Keyboard.h"
 
-Encoder myEnc(ENCODER_1_A, ENCODER_1_B);
+Encoder keyBoardEnc(KEYBOARD_ENC_A_PIN, KEYBOARD_ENC_B_PIN);
+Encoder featureEnc(FEATURE_ENC_A_PIN, FEATURE_ENC_B_PIN);
 
-Button encoder1Button;
+Button keyBoardEncButton;
+Button featureEncButton;
+Button pedalLeft;
+Button pedalRight;
 KeyBoardMode keyBoardMode;
+FeatureModes featureMode;
 LcdLayouts lcdLayout;
 
-static long oldPosition  = 0;
+static long keOldPosition  = 0;
+static long feOldPosition  = 0;
 static int  lastState = 0;
 static int  pageId = 0;
 static bool encoderIdle = true;
 static bool showDefaultL = true;
+static bool wirelessEnabled = false;
 
 void setup()
 {
-  encoder1Button.configure(ENCODER_1_BUTTON, BUTTON_LOGIC);
+  keyBoardEncButton.configure(KEYBOARD_ENC_SW_PIN, BUTTON_LOGIC);
+  featureEncButton.configure(FEATURE_ENC_SW_PIN, BUTTON_LOGIC);
+
+  pedalLeft.configure(PEDAL_LEFT_PIN, BUTTON_LOGIC);
+  pedalRight.configure(PEDAL_RIGHT_PIN, BUTTON_LOGIC);
   keyBoardMode.push_back(SingleMode{"Arrows", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW});
   keyBoardMode.push_back(SingleMode{"Pg-DU", "Pg dw", KEY_PAGE_DOWN, "Pg up", KEY_PAGE_UP});
-  keyBoardMode.push_back(SingleMode{"Nothing", "L_Pedal", -1, "R_Pedal", -1});
+  keyBoardMode.push_back(SingleMode{"Nothing", "Left", -1, "Right", -1});
   lcdLayout.init();
-  myEnc.write(0);
+
+  keyBoardEnc.write(0);
+  featureEnc.write(0);
 }
 
 
 void loop()
 {
-  long newPosition = myEnc.read() / 4;
-  if (newPosition != oldPosition)
+  // Keyboard Mode encoder -------------------------------------------
+  long newPosition = keyBoardEnc.read() / 4;
+  if (newPosition != keOldPosition)
   {
     if (false == encoderIdle) 
     {
-      newPosition > oldPosition ? keyBoardMode.nextMode() : keyBoardMode.previoustMode();
+      newPosition > keOldPosition ? keyBoardMode.nextMode() : keyBoardMode.previoustMode();
     }
 
     lcdLayout.selectKeyBoardMode(keyBoardMode.currentModeListToString());
-    oldPosition = newPosition;
+    keOldPosition = newPosition;
     encoderIdle = false;
     showDefaultL = false;
   }
 
-  if (encoder1Button.isPressed()) 
+  if (keyBoardEncButton.isPressed()) 
   {
     encoderIdle = true;
     showDefaultL = true;
   }
 
+  // Keyboard Mode encoder -------------------------------------------
+  newPosition = featureEnc.read() / 4;
+  if (newPosition != feOldPosition)
+  {
+    if (false == encoderIdle) 
+    {
+      newPosition > feOldPosition ? featureMode.nextMode() : featureMode.previoustMode();
+    }
+
+    lcdLayout.selectKeyBoardMode(featureMode.currentModeListToString());
+    feOldPosition = newPosition;
+    encoderIdle = false;
+    showDefaultL = false;
+  }
+
+  if (featureEncButton.isPressed()) 
+  {
+    featureMode.updateValues(wirelessEnabled, pageId);
+    encoderIdle = true;
+    showDefaultL = true;
+  }
+
+
+
+  // Pedals --------------------------------------------------
+  if (pedalLeft.isPressed()) 
+  {
+    pageId -= 1;
+    if (pageId < 0)
+    {
+      pageId = 0;
+    }
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirelessEnabled, keyBoardMode.currentLeftKeyToString());
+    showDefaultL = false;
+  }
+
+  if (pedalRight.isPressed()) 
+  {
+    pageId += 1;
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirelessEnabled, keyBoardMode.currentRightKeyToString());
+    showDefaultL = false;
+  }
+  if (pedalLeft.isJustReleased() || pedalRight.isJustReleased())
+  {
+    showDefaultL = true;
+  }
+
+  // Default layout -------------------------------------------
   if (showDefaultL) 
   {
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, false);
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirelessEnabled);
     showDefaultL = false;
   }
 }

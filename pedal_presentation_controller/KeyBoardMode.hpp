@@ -1,6 +1,6 @@
 #include<Arduino.h>
 #include <Vector.h>
-#include "Pinout.h"
+#include "Defines.h"
 
 struct SingleMode {
     String modeName;
@@ -16,6 +16,9 @@ public:
     void push_back(SingleMode p_newMode);
     String currentModeToString();
     String currentModeListToString();
+    String currentLeftKeyToString();
+    String currentRightKeyToString();
+
     void nextMode();
     void previoustMode();
 
@@ -24,5 +27,4 @@ private:
     int m_minNameLength;
     int m_bufferIndex;
     SingleMode m_modes[MAX_NUMB_MODES];
-    bool m_validModes[MAX_NUMB_MODES];
 };

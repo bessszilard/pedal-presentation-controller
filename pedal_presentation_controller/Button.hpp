@@ -6,10 +6,13 @@ public:
 
     bool isPressed();
 
+    bool isJustReleased();
+
     bool currentState();
 
 private:
-    int m_pin;
-    int m_logic;
-    int m_prevState;
+    int  m_pin;
+    int  m_logic;
+    int  m_prevState;
+    bool m_justReleased;
 };
