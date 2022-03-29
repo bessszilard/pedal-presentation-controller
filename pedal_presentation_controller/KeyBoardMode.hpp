@@ -15,6 +15,8 @@ class KeyBoardMode {
 public:
     KeyBoardMode();
     void push_back(SingleMode p_newMode);
+    void selectMode( int p_modeIndex );
+
     String currentModeToString();
     String currentModeListToString();
     String currentLeftKeyToString();
@@ -25,6 +27,10 @@ public:
 
     void nextMode();
     void previoustMode();
+
+    inline int getCurrentModeIndex() const {
+        return m_currentModeIndex;
+    }
 
 private:
     int m_initialized;

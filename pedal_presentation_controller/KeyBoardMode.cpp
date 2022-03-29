@@ -31,6 +31,14 @@ void KeyBoardMode::push_back(SingleMode p_newMode)
     }
 }
 
+void KeyBoardMode::selectMode( int p_modeIndex )
+{
+  if (p_modeIndex < m_bufferIndex)
+  {
+    m_currentModeIndex = p_modeIndex;
+  }
+}
+
 String KeyBoardMode::currentModeListToString()
 {
   // ------- LCD layout -------

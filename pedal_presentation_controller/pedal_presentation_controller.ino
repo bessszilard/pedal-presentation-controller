@@ -4,7 +4,7 @@
 #include "LcdLayouts.hpp"
 #include "FeatureModes.hpp"
 #include "Defines.h"
-
+#include "EepromStore.hpp"
 #include "Keyboard.h"
 
 Encoder keyBoardEnc(KEYBOARD_ENC_A_PIN, KEYBOARD_ENC_B_PIN);
@@ -17,14 +17,15 @@ Button pedalRight;
 KeyBoardMode keyBoardMode;
 FeatureModes featureMode;
 LcdLayouts lcdLayout;
+EepromStore persistentMemory;
 
 static long keOldPosition  = 0;
 static long feOldPosition  = 0;
-static int  lastState = 0;
 static int  pageId = 0;
 static bool encoderIdle = true;
 static bool showDefaultL = true;
 static bool wirEn = false;      // Wireless enabled
+static uint8_t modeIndex = 0;
 
 void setup()
 {
@@ -37,6 +38,18 @@ void setup()
   keyBoardMode.push_back(SingleMode{"Pg-UD", "Pg up", KEY_PAGE_UP, "Pg dw", KEY_PAGE_DOWN, true});
   keyBoardMode.push_back(SingleMode{"Nothing", "Left", 0, "Right", 0, false});
   lcdLayout.init();
+  
+  uint8_t wirEnFromMemory;
+  if (persistentMemory.loadConfig(modeIndex, wirEnFromMemory))
+  {
+    keyBoardMode.selectMode(modeIndex);
+    wirEn = wirEnFromMemory;
+  }
+  else
+  {
+    modeIndex = 0;
+    wirEn = false;
+  }
 
   keyBoardEnc.write(0);
   featureEnc.write(0);
@@ -62,6 +75,8 @@ void loop()
 
   if (keyBoardEncButton.isPressed()) 
   {
+    persistentMemory.storeKeyboardMode(keyBoardMode.getCurrentModeIndex());
+
     encoderIdle = true;
     showDefaultL = true;
   }
@@ -84,6 +99,8 @@ void loop()
   if (featureEncButton.isPressed()) 
   {
     featureMode.updateValues(wirEn, pageId);
+
+    persistentMemory.storeWirelessMode((uint8_t)wirEn);
     encoderIdle = true;
     showDefaultL = true;
   }
