@@ -8,6 +8,7 @@ struct SingleMode {
     int leftChar;
     String rightCharName;
     int rightChar;
+    bool sendKey;
 };
 
 class KeyBoardMode {
@@ -19,10 +20,14 @@ public:
     String currentLeftKeyToString();
     String currentRightKeyToString();
 
+    void sendCurrentRightKey();
+    void sendCurrentLeftKey();
+
     void nextMode();
     void previoustMode();
 
 private:
+    int m_initialized;
     int m_currentModeIndex;
     int m_minNameLength;
     int m_bufferIndex;

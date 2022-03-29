@@ -24,7 +24,7 @@ static int  lastState = 0;
 static int  pageId = 0;
 static bool encoderIdle = true;
 static bool showDefaultL = true;
-static bool wirelessEnabled = false;
+static bool wirEn = false;      // Wireless enabled
 
 void setup()
 {
@@ -33,9 +33,9 @@ void setup()
 
   pedalLeft.configure(PEDAL_LEFT_PIN, BUTTON_LOGIC);
   pedalRight.configure(PEDAL_RIGHT_PIN, BUTTON_LOGIC);
-  keyBoardMode.push_back(SingleMode{"Arrows", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW});
-  keyBoardMode.push_back(SingleMode{"Pg-DU", "Pg dw", KEY_PAGE_DOWN, "Pg up", KEY_PAGE_UP});
-  keyBoardMode.push_back(SingleMode{"Nothing", "Left", -1, "Right", -1});
+  keyBoardMode.push_back(SingleMode{"Arrows", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW, true});
+  keyBoardMode.push_back(SingleMode{"Pg-UD", "Pg up", KEY_PAGE_UP, "Pg dw", KEY_PAGE_DOWN, true});
+  keyBoardMode.push_back(SingleMode{"Nothing", "Left", 0, "Right", 0, false});
   lcdLayout.init();
 
   keyBoardEnc.write(0);
@@ -66,7 +66,7 @@ void loop()
     showDefaultL = true;
   }
 
-  // Keyboard Mode encoder -------------------------------------------
+  // Feature Mode encoder -------------------------------------------
   newPosition = featureEnc.read() / 4;
   if (newPosition != feOldPosition)
   {
@@ -83,7 +83,7 @@ void loop()
 
   if (featureEncButton.isPressed()) 
   {
-    featureMode.updateValues(wirelessEnabled, pageId);
+    featureMode.updateValues(wirEn, pageId);
     encoderIdle = true;
     showDefaultL = true;
   }
@@ -93,19 +93,19 @@ void loop()
   // Pedals --------------------------------------------------
   if (pedalLeft.isPressed()) 
   {
-    pageId -= 1;
-    if (pageId < 0)
-    {
-      pageId = 0;
-    }
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirelessEnabled, keyBoardMode.currentLeftKeyToString());
+    pageId = pageId == 0 ? 0 : pageId - 1;
+    keyBoardMode.sendCurrentLeftKey();
+
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentLeftKeyToString());
     showDefaultL = false;
   }
 
   if (pedalRight.isPressed()) 
   {
     pageId += 1;
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirelessEnabled, keyBoardMode.currentRightKeyToString());
+    keyBoardMode.sendCurrentRightKey();
+
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentRightKeyToString());
     showDefaultL = false;
   }
   if (pedalLeft.isJustReleased() || pedalRight.isJustReleased())
@@ -116,7 +116,7 @@ void loop()
   // Default layout -------------------------------------------
   if (showDefaultL) 
   {
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirelessEnabled);
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn);
     showDefaultL = false;
   }
 }

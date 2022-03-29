@@ -1,3 +1,4 @@
+#include "Keyboard.h"
 #include "KeyBoardMode.hpp"
 
 KeyBoardMode::KeyBoardMode() : 
@@ -9,6 +10,11 @@ KeyBoardMode::KeyBoardMode() :
 
 void KeyBoardMode::push_back(SingleMode p_newMode)
 {
+  if (false == m_initialized)
+  {
+    Keyboard.begin();
+    m_initialized = true;
+  }
     m_modes[m_bufferIndex] = p_newMode;
 
     int mNameL = m_modes[m_bufferIndex].modeName.length();
@@ -27,8 +33,12 @@ void KeyBoardMode::push_back(SingleMode p_newMode)
 
 String KeyBoardMode::currentModeListToString()
 {
+  // ------- LCD layout -------
   // 0123456789ABCDEF
   // ODE0 MODE1 MODE2
+  //      ^^^^
+  // --------------------------
+
   int tempIndex = m_currentModeIndex;
 
   String lcdLine = m_modes[tempIndex].modeName;
@@ -68,6 +78,23 @@ String KeyBoardMode::currentRightKeyToString()
 {
   return m_modes[m_currentModeIndex].rightCharName;
 }
+
+void KeyBoardMode::sendCurrentRightKey()
+{
+  if (m_modes[m_currentModeIndex].sendKey) {
+    Keyboard.press(m_modes[m_currentModeIndex].rightChar);
+    Keyboard.releaseAll();
+  }
+}
+
+void KeyBoardMode::sendCurrentLeftKey()
+{
+  if (m_modes[m_currentModeIndex].sendKey) {
+    Keyboard.press(m_modes[m_currentModeIndex].leftChar);
+    Keyboard.releaseAll();
+  }
+}
+
 
 void KeyBoardMode::nextMode() 
 {
