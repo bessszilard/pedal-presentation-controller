@@ -25,10 +25,20 @@ bool EepromStore::loadConfig(uint8_t &p_mode, uint8_t &p_wirEn)
 
 void EepromStore::storeWirelessMode(uint8_t p_wirEn)
 {
+    uint8_t wirEn = EEPROM.read(EEPROM_KEYBOARD_MODE_ADDRESS);
+    if (wirEn == p_wirEn)
+    {
+        return;
+    }
     EEPROM.write(EEPROM_WIRE_MODE_ADDRESS, p_wirEn);
 }
 
 void EepromStore::storeKeyboardMode(uint8_t p_mode)
 {
+    uint8_t mode = EEPROM.read(EEPROM_KEYBOARD_MODE_ADDRESS);
+    if (mode == p_mode)
+    {
+        return;
+    }
     EEPROM.write(EEPROM_KEYBOARD_MODE_ADDRESS, p_mode);
 }
