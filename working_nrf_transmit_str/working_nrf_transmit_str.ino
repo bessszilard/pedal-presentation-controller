@@ -20,7 +20,7 @@ bool role = true;  // true = TX role, false = RX role
 float payload = 0.0;
 
 //ch:PG_DW pg:0001
-String command = "ch:PG_DW pg:0001";
+char command[20] = "ch:PG_DW pg:0001";
 
 void setup() {
 
@@ -49,7 +49,7 @@ void setup() {
   radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
   // save on transmission time by setting the radio to only transmit the
-  radio.setPayloadSize(sizeof(command));
+  radio.setPayloadSize(8);
 
   // set the TX address of the RX node into the TX pipe
   radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
@@ -69,7 +69,9 @@ void loop() {
 
     unsigned long start_timer = micros();                    // start the timer
 //    bool report = radio.write(&command, sizeof(command));    // transmit & save the report
-    bool report = radio.write(&command, sizeof(command) * command.length());    // transmit & save the report
+//    bool report = radio.write(&command, 20);    // transmit & save the report
+    bool report = radio.write(command, 8);    // transmit & save the report
+     report = radio.write(command+8, 8);    // transmit & save the report
     unsigned long end_timer = micros();                      // end the timer
 
     if (report) {
@@ -77,10 +79,10 @@ void loop() {
       Serial.print(F("Time to transmit = "));
       Serial.print(end_timer - start_timer);                 // print the timer result
       Serial.print(F(" us. Sent: "));
-      Serial.println(payload);                               // print payload sent
-      payload += 0.01;                                       // increment float payload
+      Serial.println(command);                               // print payload sent
     } else {
       Serial.println(F("Transmission failed or timed out")); // payload was not delivered
+      Serial.println(command);                               // print payload sent
     }
 
     // to make this example readable in the serial monitor

@@ -48,14 +48,15 @@ void setup() {
   Serial.println((int)radioNumber);
 
   radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
-  radio.setPayloadSize(sizeof(commandExample)); // * commandExample.length()); // float datatype occupies 4 bytes
+  radio.setPayloadSize(8); // * commandExample.length()); // float datatype occupies 4 bytes
 
   // set the RX address of the TX node into a RX pipe
   radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
   radio.startListening(); // put radio in RX mode
 } // setup
 
-String cmd;
+//String cmd;
+char cmd[20];
 
 void loop() {
     // This device is a RX node
@@ -63,7 +64,7 @@ void loop() {
     uint8_t pipe;
     if (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
       uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
-      radio.read(&cmd, bytes);               // fetch payload from FIFO
+      radio.read(cmd, bytes);               // fetch payload from FIFO
       Serial.print(F("Received "));
       Serial.print(bytes);                    // print the size of the payload
       Serial.print(F(" bytes on pipe "));
