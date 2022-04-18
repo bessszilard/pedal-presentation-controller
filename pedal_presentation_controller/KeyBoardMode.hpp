@@ -21,6 +21,8 @@ public:
     String currentModeListToString();
     String currentLeftKeyToString();
     String currentRightKeyToString();
+    int currentLeftKey();
+    int currentRightKey();
 
     void sendCurrentRightKey();
     void sendCurrentLeftKey();

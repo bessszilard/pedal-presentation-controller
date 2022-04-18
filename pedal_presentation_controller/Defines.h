@@ -10,6 +10,9 @@
 #define PEDAL_LEFT_PIN A2
 #define PEDAL_RIGHT_PIN A3
 
+#define RADIO_CE_PIN A1
+#define RADIO_CSN_PIN A0
+
 #define BUTTON_LOGIC 0
 
 #define MAX_NUMB_MODES 10

@@ -14,12 +14,13 @@ TODOsz
 1   ^         
 
 ```
-- [ ] justReleased()
-- [ ] Save to EEPROM
-- [ ] Send characters
+- [X] justReleased()
+- [X] Save to EEPROM
+- [X] Send characters
 - [ ] wireless
         another encoder
         SPI module
 
-- [ ] Design circuit
-- [ ] 
+- [X] Design circuit
+- [ ] Store only if new value
+- [ ] Design the box

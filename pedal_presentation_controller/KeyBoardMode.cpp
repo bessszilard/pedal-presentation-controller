@@ -87,6 +87,16 @@ String KeyBoardMode::currentRightKeyToString()
   return m_modes[m_currentModeIndex].rightCharName;
 }
 
+int KeyBoardMode::currentLeftKey()
+{
+  return m_modes[m_currentModeIndex].leftChar;
+}
+
+int KeyBoardMode::currentRightKey()
+{
+  return m_modes[m_currentModeIndex].rightChar;
+}
+
 void KeyBoardMode::sendCurrentRightKey()
 {
   if (m_modes[m_currentModeIndex].sendKey) {

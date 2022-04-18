@@ -6,9 +6,11 @@
 #include "Defines.h"
 #include "EepromStore.hpp"
 #include "Keyboard.h"
+#include "Radio.hpp"
 
 Encoder keyBoardEnc(KEYBOARD_ENC_A_PIN, KEYBOARD_ENC_B_PIN);
 Encoder featureEnc(FEATURE_ENC_A_PIN, FEATURE_ENC_B_PIN);
+Radio radio(RADIO_CE_PIN, RADIO_CSN_PIN, Radio::Mode::Transmitter);
 
 Button keyBoardEncButton;
 Button featureEncButton;
@@ -34,9 +36,9 @@ void setup()
 
   pedalLeft.configure(PEDAL_LEFT_PIN, BUTTON_LOGIC);
   pedalRight.configure(PEDAL_RIGHT_PIN, BUTTON_LOGIC);
+  keyBoardMode.push_back(SingleMode{"Nothing", "Left", 0, "Right", 0, false});  // default
   keyBoardMode.push_back(SingleMode{"Arrows", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW, true});
   keyBoardMode.push_back(SingleMode{"Pg-UD", "Pg up", KEY_PAGE_UP, "Pg dw", KEY_PAGE_DOWN, true});
-  keyBoardMode.push_back(SingleMode{"Nothing", "Left", 0, "Right", 0, false});
   lcdLayout.init();
   
   uint8_t wirEnFromMemory;
@@ -105,13 +107,20 @@ void loop()
     showDefaultL = true;
   }
 
-
+  // Radio ---------------------------------------------------
+  if(wirEn && (false == radio.isInitialized()))
+  {
+    radio.init();
+  }
+  
 
   // Pedals --------------------------------------------------
   if (pedalLeft.isPressed()) 
   {
     pageId = pageId == 0 ? 0 : pageId - 1;
     keyBoardMode.sendCurrentLeftKey();
+    if (wirEn)
+      radio.sendMessage(keyBoardMode.currentLeftKey(), pageId);
 
     lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentLeftKeyToString());
     showDefaultL = false;
@@ -122,6 +131,9 @@ void loop()
     pageId += 1;
     keyBoardMode.sendCurrentRightKey();
 
+    if (wirEn)
+      radio.sendMessage(keyBoardMode.currentRightKey(), pageId);
+
     lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentRightKeyToString());
     showDefaultL = false;
   }
@@ -129,6 +141,10 @@ void loop()
   {
     showDefaultL = true;
   }
+
+
+
+
 
   // Default layout -------------------------------------------
   if (showDefaultL) 
