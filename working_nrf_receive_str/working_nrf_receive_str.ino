@@ -48,7 +48,7 @@ void setup() {
   Serial.println((int)radioNumber);
 
   radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
-  radio.setPayloadSize(8); // * commandExample.length()); // float datatype occupies 4 bytes
+  radio.setPayloadSize(5); // * commandExample.length()); // float datatype occupies 4 bytes
 
   // set the RX address of the TX node into a RX pipe
   radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1

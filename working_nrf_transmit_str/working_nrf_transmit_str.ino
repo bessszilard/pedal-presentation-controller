@@ -1,6 +1,7 @@
 #include <SPI.h>
 #include "printf.h"
 #include "RF24.h"
+#include "Protocol.hpp"
 
 // CE, CSN pins
 RF24 radio(A1, A0);
@@ -49,29 +50,29 @@ void setup() {
   radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
   // save on transmission time by setting the radio to only transmit the
-  radio.setPayloadSize(8);
+  radio.setPayloadSize(5);
 
   // set the TX address of the RX node into the TX pipe
   radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
   radio.stopListening();  // put radio in TX mode
-
-  // For debugging info
-  // printf_begin();             // needed only once for printing details
-//  radio.printDetails();       // (smaller) function that prints raw register values
-  // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
 } // setup
 
 void loop() {
 
   if (role) {
-    // This device is a TX node
+    uint8_t txPayload[5];
+    uint8_t keyboardChar = 0xD8;
+    int16_t pageId = 123;
+    
+    Protocol::EncodeMessage(keyboardChar, pageId, txPayload);
+
 
     unsigned long start_timer = micros();                    // start the timer
 //    bool report = radio.write(&command, sizeof(command));    // transmit & save the report
 //    bool report = radio.write(&command, 20);    // transmit & save the report
-    bool report = radio.write(command, 8);    // transmit & save the report
-     report = radio.write(command+8, 8);    // transmit & save the report
+    bool report = radio.write(txPayload, 5);    // transmit & save the report
+//     report = radio.write(command+8, 8);    // transmit & save the report
     unsigned long end_timer = micros();                      // end the timer
 
     if (report) {
