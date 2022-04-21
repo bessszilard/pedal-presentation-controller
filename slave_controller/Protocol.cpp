@@ -1,6 +1,7 @@
 #include "Protocol.hpp"
+#include <Arduino.h>
 
-uint8_t Protocol::GetCheckSum(uint8_t p_payload[5])
+uint8_t Protocol::GetCheckSum(uint8_t p_payload[PAYLOAD_SIZE])
 {
     uint8_t checkSum = p_payload[0];
     for(int i=1; i<4; ++i)
@@ -10,33 +11,35 @@ uint8_t Protocol::GetCheckSum(uint8_t p_payload[5])
     return checkSum;
 }
 
-bool Protocol::DecodeMessage(uint8_t p_payload[5], uint8_t& p_keyboardChar, int16_t& p_pageID)
+bool Protocol::DecodeMessage(uint8_t p_payload[PAYLOAD_SIZE], uint8_t& p_leftPedalKey, uint8_t& p_rightPedalKey, int16_t& p_pageID)
 {
-    if (p_payload[0] != 'm')
+    if (p_payload[M_CHAR_POS] != 'm')
     {
         return false;
     }
 
     uint8_t checkSum = GetCheckSum(p_payload);
     
-    if (p_payload[4] != checkSum)
+    if (p_payload[CHECK_SUM_POS] != checkSum)
     {
         return false;
     }
 
-    p_keyboardChar = p_payload[1];
-    p_pageID = (p_payload[2] << 8) + p_payload[3];
+    p_leftPedalKey = p_payload[LEFT_KEY_CHAR_POS];
+    p_rightPedalKey = p_payload[RIGHT_KEY_CHAR_POS];
+    p_pageID = (p_payload[PAGE_ID_POS_MSB] << 8) + p_payload[PAGE_ID_POS_LSB];
 
     return true;
 }
 
-bool Protocol::EncodeMessage(uint8_t p_keyboardChar, int16_t p_pageID, uint8_t p_payload[5])
+bool Protocol::EncodeMessage(uint8_t p_leftPedalKey, uint8_t p_rightPedalKey, int16_t p_pageID, uint8_t p_payload[PAYLOAD_SIZE])
 {
-    p_payload[0]= 'm';
-    p_payload[1] = p_keyboardChar;
-    p_payload[2] = p_pageID >> 8;       // MSB
-    p_payload[3] = 0xFF & p_pageID;     // LSB
-    p_payload[4] = GetCheckSum(p_payload);
+    p_payload[M_CHAR_POS]         = 'm';
+    p_payload[LEFT_KEY_CHAR_POS]  = p_leftPedalKey;
+    p_payload[RIGHT_KEY_CHAR_POS] = p_rightPedalKey;
+    p_payload[PAGE_ID_POS_MSB]    = p_pageID >> 8;       // MSB
+    p_payload[PAGE_ID_POS_LSB]    = 0xFF & p_pageID;     // LSB
+    p_payload[CHECK_SUM_POS]      = GetCheckSum(p_payload);
     return true;
 }
 

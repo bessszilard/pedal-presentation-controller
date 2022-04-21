@@ -17,9 +17,11 @@ public:
 
     bool init();
     bool available(uint8_t* p_pipe);
-    bool readMessage(uint8_t& p_character, uint16_t& p_pageID);
+    bool readMessage(uint8_t& p_leftPedalKey, uint8_t& p_rightPedalKey, int16_t& p_pageID);
     bool readMessage(String& p_message);
-    bool sendMessage(uint8_t p_keyboardChar, int16_t p_pageID);
+    bool sendMessage(uint8_t p_leftPedalKey, uint8_t p_rightPedalKey, int16_t p_pageID);
+
+    inline bool isInitialized() { return m_initialized; }
 private:
     RF24* m_nrf24;
     bool m_initialized;

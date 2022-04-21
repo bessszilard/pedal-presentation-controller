@@ -100,7 +100,10 @@ void loop()
     featureMode.updateValues(wirEn, pageId, goBack);
 
     if (goBack)
+    {
       keyBoardMode.goToStartPage(pageId);
+      radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
+    }
 
     persistentMemory.storeWirelessMode((uint8_t)wirEn);
     encoderIdle = true;
@@ -119,7 +122,7 @@ void loop()
   {
     keyBoardMode.sendCurrentLeftKey(pageId);
     if (wirEn)
-      radio.sendMessage(keyBoardMode.currentLeftKey(), pageId);
+      radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
     lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentLeftKeyToString());
     showDefaultL = false;
@@ -130,7 +133,7 @@ void loop()
     keyBoardMode.sendCurrentRightKey(pageId);
 
     if (wirEn)
-      radio.sendMessage(keyBoardMode.currentRightKey(), pageId);
+      radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
     lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentRightKeyToString());
     showDefaultL = false;
