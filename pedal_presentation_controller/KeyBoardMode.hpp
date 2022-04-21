@@ -1,4 +1,4 @@
-#include<Arduino.h>
+#include <Arduino.h>
 #include <Vector.h>
 #include "Defines.h"
 
@@ -8,7 +8,7 @@ struct SingleMode {
     int leftChar;
     String rightCharName;
     int rightChar;
-    bool sendKey;
+    int sendMultipleTimes;
 };
 
 class KeyBoardMode {
@@ -21,12 +21,15 @@ public:
     String currentModeListToString();
     String currentLeftKeyToString();
     String currentRightKeyToString();
+    int currentLeftKey();
+    int currentRightKey();
 
-    void sendCurrentRightKey();
-    void sendCurrentLeftKey();
+    void sendCurrentRightKey(int16_t& p_pageId);
+    void sendCurrentLeftKey(int16_t& p_pageId);
 
     void nextMode();
     void previoustMode();
+    void goToStartPage(int16_t& p_pageId);
 
     inline int getCurrentModeIndex() const {
         return m_currentModeIndex;

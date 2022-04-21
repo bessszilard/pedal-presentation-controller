@@ -7,6 +7,7 @@ enum class FeatureActionEnum
     WirelessOn = 0,
     WirelessOff,
     ResetPageId,
+    ResetPageIdAndGoBack,
     Count
 };
 
@@ -25,7 +26,7 @@ public:
 
     void nextMode();
     void previoustMode();
-    void updateValues(bool& p_wirelessMode, int& p_pageId);
+    void updateValues(bool& p_wirelessMode, int16_t& p_pageId, bool& p_goBack);
 
 private:
     int m_currentModeIndex;

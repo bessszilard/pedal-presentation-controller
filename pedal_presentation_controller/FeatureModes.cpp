@@ -8,6 +8,7 @@ FeatureModes::FeatureModes() :
   push_back(FeatureMode {"Wir-Off", FeatureActionEnum::WirelessOn});
   push_back(FeatureMode {"Wir-On", FeatureActionEnum::WirelessOff});
   push_back(FeatureMode {"Rst-pgNum", FeatureActionEnum::ResetPageId});
+  push_back(FeatureMode {"Rst+GoBack", FeatureActionEnum::ResetPageIdAndGoBack});
 }
 
 void FeatureModes::push_back(FeatureMode p_newMode)
@@ -80,12 +81,14 @@ void FeatureModes::previoustMode()
   }
 }
 
-void FeatureModes::updateValues(bool& p_wirelessMode, int& p_pageId)
+void FeatureModes::updateValues(bool& p_wirelessMode, int& p_pageId, bool& p_goBack)
 {
-    switch(m_modes[m_currentModeIndex].action)
-    {
-      case FeatureActionEnum::WirelessOn:  p_wirelessMode = false; break;
-      case FeatureActionEnum::WirelessOff:  p_wirelessMode = true; break;
-      case FeatureActionEnum::ResetPageId:  p_pageId = 0; break;
-    }
+  p_goBack = false;
+  switch(m_modes[m_currentModeIndex].action)
+  {
+    case FeatureActionEnum::WirelessOn:           p_wirelessMode = false;   break;
+    case FeatureActionEnum::WirelessOff:          p_wirelessMode = true;    break;
+    case FeatureActionEnum::ResetPageId:          p_pageId = 0;             break;
+    case FeatureActionEnum::ResetPageIdAndGoBack: p_goBack = true;          break;
+  }
 }
