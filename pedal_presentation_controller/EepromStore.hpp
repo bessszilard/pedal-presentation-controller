@@ -3,7 +3,7 @@
 class EepromStore {
 public:
     EepromStore();
-    bool loadConfig(uint8_t &p_mode, uint8_t &p_wirEn);
+    void loadConfig(uint8_t &p_mode, uint8_t &p_wirEn);
     void storeWirelessMode(uint8_t p_mode);
     void storeKeyboardMode(uint8_t p_wirEn);
 

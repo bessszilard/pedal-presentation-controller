@@ -97,19 +97,44 @@ int KeyBoardMode::currentRightKey()
   return m_modes[m_currentModeIndex].rightChar;
 }
 
-void KeyBoardMode::sendCurrentRightKey()
+void KeyBoardMode::sendCurrentRightKey(int16_t& p_pageId)
 {
-  if (m_modes[m_currentModeIndex].sendKey) {
+  for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+  {
     Keyboard.press(m_modes[m_currentModeIndex].rightChar);
     Keyboard.releaseAll();
+    p_pageId++;
   }
 }
 
-void KeyBoardMode::sendCurrentLeftKey()
+void KeyBoardMode::sendCurrentLeftKey(int16_t& p_pageId)
 {
-  if (m_modes[m_currentModeIndex].sendKey) {
+  for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+  {
     Keyboard.press(m_modes[m_currentModeIndex].leftChar);
     Keyboard.releaseAll();
+    p_pageId--;
+    if (p_pageId < 0)
+    {
+      p_pageId = 0;
+    }
+  }
+}
+
+void KeyBoardMode::goToStartPage(int16_t& p_pageId)
+{
+  // in this case no need to go back to the start page
+  if (p_pageId <= 0)
+  {
+    p_pageId = 0;
+    return;
+  }
+
+  while(p_pageId != 0)
+  {
+    Keyboard.press(m_modes[m_currentModeIndex].leftChar);
+    Keyboard.releaseAll();
+    p_pageId--;
   }
 }
 

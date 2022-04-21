@@ -10,17 +10,19 @@ EepromStore::EepromStore() :
     
 }
 
-bool EepromStore::loadConfig(uint8_t &p_mode, uint8_t &p_wirEn)
+void EepromStore::loadConfig(uint8_t &p_mode, uint8_t &p_wirEn)
 {
     p_mode = EEPROM.read(EEPROM_KEYBOARD_MODE_ADDRESS);
     p_wirEn = EEPROM.read(EEPROM_WIRE_MODE_ADDRESS);
 
-    // is eeprom valid?
-    if (p_mode < MAX_NUMB_MODES && (p_wirEn == 0 || p_wirEn == 1))
+    // if invalid, load with default
+    if (MAX_NUMB_MODES < p_mode)
+        p_mode = 0;
+
+    if (p_wirEn != 0 && p_wirEn != 1)
     {
-        return true;
+        p_wirEn = 0;
     }
-    return false;
 }
 
 void EepromStore::storeWirelessMode(uint8_t p_wirEn)
