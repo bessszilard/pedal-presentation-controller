@@ -27,6 +27,8 @@ public:
     void nextMode();
     void previoustMode();
     void updateValues(bool& p_wirelessMode, int16_t& p_pageId, bool& p_goBack);
+    void selectMode(int p_modeIndex);
+    int getCurrentModeIndex() {return m_currentModeIndex;}
 
 private:
     int m_currentModeIndex;

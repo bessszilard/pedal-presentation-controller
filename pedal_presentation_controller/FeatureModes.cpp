@@ -92,3 +92,11 @@ void FeatureModes::updateValues(bool& p_wirelessMode, int& p_pageId, bool& p_goB
     case FeatureActionEnum::ResetPageIdAndGoBack: p_goBack = true;          break;
   }
 }
+
+void FeatureModes::selectMode( int p_modeIndex )
+{
+  if (p_modeIndex < m_bufferIndex)
+  {
+    m_currentModeIndex = p_modeIndex;
+  }
+}

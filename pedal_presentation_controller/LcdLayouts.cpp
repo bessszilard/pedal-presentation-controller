@@ -20,13 +20,17 @@ void LcdLayouts::selectKeyBoardMode(const String& p_firstLine)
     m_lcd.print("     ^^^^");
 }
 
-void LcdLayouts::defaultL(const String& p_mode, int p_pageId, bool p_wireless, const String& p_buttonText /*= ""*/)
+void LcdLayouts::defaultL(const String& p_mode, int p_pageId, bool p_wireless, bool p_wirelessError=false, const String& p_buttonText /*= ""*/)
 {
     // 0 M:PG_DU  PG:1000  
     // 1 W:OFF BT:PG_DW 
 
     String firstLine = "M:" + p_mode + "  PG:" + String(p_pageId);
     String wirelessText = p_wireless ? "ON " : "OFF";
+    if (p_wireless && p_wirelessError)
+    {
+        wirelessText = "ERR";
+    }
     String secondLine = "W:" + wirelessText + "  BT:" + p_buttonText;
 
     m_lcd.clear();

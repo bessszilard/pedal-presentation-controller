@@ -2,26 +2,33 @@
 #include "Protocol.hpp"
 #include "Keyboard.h"
 
+#define DEBUG 1
+
 Radio radio(A1, A0, Radio::Mode::Receiver);
 
 bool isSerialAvialable = false;
 
 void setup() {
-
+#if DEBUG
   Serial.begin(115200);
   isSerialAvialable = Serial;
-  //  while (!Serial) {
+  while (!Serial) {
   //    // some boards need to wait to ensure access to serial over USB
-  //  }
+  }
+#endif
 
   // initialize the transceiver on the SPI bus
   if (!radio.init()) {
+    #if DEBUG
     Serial.println(F("radio hardware is not responding!!"));
+    #endif
     while (1) {} // hold in infinite loop
   }
 
+  #if DEBUG
   // print example's introductory prompt
   Serial.println(F("RF24/examples/GettingStarted"));
+  #endif
 } // setup
 
 int16_t originalPageId = 0;
@@ -38,12 +45,14 @@ void loop() {
       String leftCharStr, rightCharStr ;
       Protocol::AsciiByteToStr(leftPedalChar, leftCharStr);
       Protocol::AsciiByteToStr(rightPedalChar, rightCharStr);
+#if DEBUG
       Serial.println("Rec:" + leftCharStr + " " + rightCharStr + " PgID:" + String(receivedPagId));
-
+#endif
       if (originalPageId < receivedPagId)
       {
         while (originalPageId < receivedPagId)
         {
+          Serial.println("Go forward:" + String(receivedPagId - originalPageId ));
           Keyboard.press(rightPedalChar);
           Keyboard.releaseAll();
           originalPageId++;
@@ -65,7 +74,9 @@ void loop() {
 
     }
     else {
+#if DEBUG
       Serial.println("corrupt message");
+#endif
     }
   }
 }

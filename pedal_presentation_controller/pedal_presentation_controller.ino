@@ -10,7 +10,7 @@
 
 Encoder keyBoardEnc(KEYBOARD_ENC_A_PIN, KEYBOARD_ENC_B_PIN);
 Encoder featureEnc(FEATURE_ENC_A_PIN, FEATURE_ENC_B_PIN);
-Radio radio(RADIO_CE_PIN, RADIO_CSN_PIN, Radio::Mode::Transmitter);
+Radio radio(RADIO_CE_PIN, RADIO_CSN_PIN, Radio::Mode::Transmitter, 20);
 
 Button keyBoardEncButton;
 Button featureEncButton;
@@ -25,12 +25,20 @@ static long keOldPosition  = 0;
 static long feOldPosition  = 0;
 static int16_t  pageId = 0;
 static bool encoderIdle = true;
-static bool showDefaultL = true;
+static bool udpateDefaultL = true;
 static bool wirEn = false;      // Wireless enabled
+static bool lastWirEn = false;      // Wireless enabled
+static bool wirError = false;      // Wireless error
 static uint8_t modeIndex = 0;
+static uint8_t FeatureModeIndex = 0;
 
 void setup()
 {
+#if DEBUG
+  Serial.begin(115200);
+  while(!Serial) {}
+#endif
+
   keyBoardEncButton.configure(KEYBOARD_ENC_SW_PIN, BUTTON_LOGIC);
   featureEncButton.configure(FEATURE_ENC_SW_PIN, BUTTON_LOGIC);
 
@@ -45,12 +53,19 @@ void setup()
   lcdLayout.init();
   
   uint8_t wirEnFromMemory;
-  persistentMemory.loadConfig(modeIndex, wirEnFromMemory);
+  persistentMemory.loadConfig(modeIndex, wirEnFromMemory, FeatureModeIndex);
   keyBoardMode.selectMode(modeIndex);
+  featureMode.selectMode(FeatureModeIndex);
   wirEn = wirEnFromMemory;
+
+#if DEBUG
+  Serial.println("Loaded values from EEPROM");
+  Serial.println("Keboard:" + String(keyBoardMode.currentModeToString()) + " " + String(wirEn) + " " + String(featureMode.currentModeToString()));
+#endif
   
   keyBoardEnc.write(0);
   featureEnc.write(0);
+
 }
 
 
@@ -68,15 +83,14 @@ void loop()
     lcdLayout.selectKeyBoardMode(keyBoardMode.currentModeListToString());
     keOldPosition = newPosition;
     encoderIdle = false;
-    showDefaultL = false;
+    udpateDefaultL = false;
   }
 
   if (keyBoardEncButton.isPressed()) 
   {
     persistentMemory.storeKeyboardMode(keyBoardMode.getCurrentModeIndex());
-
     encoderIdle = true;
-    showDefaultL = true;
+    udpateDefaultL = true;
   }
 
   // Feature Mode encoder -------------------------------------------
@@ -91,7 +105,7 @@ void loop()
     lcdLayout.selectKeyBoardMode(featureMode.currentModeListToString());
     feOldPosition = newPosition;
     encoderIdle = false;
-    showDefaultL = false;
+    udpateDefaultL = false;
   }
 
   if (featureEncButton.isPressed()) 
@@ -106,15 +120,44 @@ void loop()
     }
 
     persistentMemory.storeWirelessMode((uint8_t)wirEn);
+    persistentMemory.storeFeatureMode(featureMode.getCurrentModeIndex());
+#if DEBUG
+  Serial.println("FeatureMode stored: " + String(featureMode.currentModeToString()));
+#endif
+
     encoderIdle = true;
-    showDefaultL = true;
+    udpateDefaultL = true;
   }
 
   // Radio ---------------------------------------------------
-  if(wirEn && (false == radio.isInitialized()))
+  if(wirEn)
   {
-    radio.init();
+    if (false == radio.isInitialized())
+    {
+      if (false == radio.init())
+        wirError = true;
+      else
+        wirError = false;
+    }
+    else if(false == radio.isAvailable() && (false == wirError))
+    {
+      wirError = true;
+      radio.reset();
+    }
   }
+  if (lastWirEn != wirError)
+  {
+    udpateDefaultL = true;
+    lastWirEn = wirError;
+  }
+
+  
+#if DEBUG
+  Serial.println("radio.isAvailable:" + String(radio.isAvailable()) + "Wir error: " + wirError);
+#endif
+
+  if (radio.isInitialized() && wirError)
+    radio.reset();
   
 
   // Pedals --------------------------------------------------
@@ -125,7 +168,7 @@ void loop()
       radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
     lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentLeftKeyToString());
-    showDefaultL = false;
+    udpateDefaultL = false;
   }
 
   if (pedalRight.isPressed()) 
@@ -136,21 +179,17 @@ void loop()
       radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
     lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentRightKeyToString());
-    showDefaultL = false;
+    udpateDefaultL = false;
   }
   if (pedalLeft.isJustReleased() || pedalRight.isJustReleased())
   {
-    showDefaultL = true;
+    udpateDefaultL = true;
   }
 
-
-
-
-
   // Default layout -------------------------------------------
-  if (showDefaultL) 
+  if (udpateDefaultL) 
   {
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn);
-    showDefaultL = false;
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError);
+    udpateDefaultL = false;
   }
 }

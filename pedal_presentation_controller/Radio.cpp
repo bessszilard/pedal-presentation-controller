@@ -4,10 +4,11 @@
 #include "RF24.h"
 #include "Protocol.hpp"
 
-Radio::Radio(int p_CE_pin, int p_CSN_pin, Mode p_radioMode, uint8_t p_payLoad /* = 6*/) :
+Radio::Radio(int p_CE_pin, int p_CSN_pin, Mode p_radioMode, uint8_t p_sendXTimes /* = 6*/) :
       m_radioMode(p_radioMode)
     , m_nrf24 {new RF24(p_CE_pin, p_CSN_pin)}
     , m_initialized(false)
+    , m_sendXTimes(p_sendXTimes)
 {
 }
 
@@ -23,9 +24,12 @@ bool Radio::init()
         return true;
     }
     
-    bool radioStarted = m_nrf24->begin();
-    uint8_t address[6] = "1Node";
+    if(false == m_nrf24->begin())
+    {
+        return false;
+    }
 
+    uint8_t address[6] = "1Node";
     m_nrf24->setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
     m_nrf24->setPayloadSize(PAYLOAD_SIZE);  // * commandExample.length()); // float datatype occupies 4 bytes
 
@@ -42,11 +46,9 @@ bool Radio::init()
             m_nrf24->stopListening();  // put radio in TX mode
             break;
     }
-    if (radioStarted)
-    {
-        m_initialized = true;
-    }
-    return radioStarted;
+
+    m_initialized = true;
+    return true;
 }
 
 bool Radio::available(uint8_t* p_pipe)
@@ -95,5 +97,20 @@ bool Radio::sendMessage(uint8_t p_leftPedalKey, uint8_t p_rightPedalKey, int16_t
 {
     uint8_t txPayload[PAYLOAD_SIZE];
     Protocol::EncodeMessage(p_leftPedalKey, p_rightPedalKey, p_pageID, txPayload);
-    return m_nrf24->write(txPayload, PAYLOAD_SIZE);    // transmit & save the report
+    
+    for(uint8_t i = 0; i < m_sendXTimes; ++i)
+    {
+        if (false == m_nrf24->write(txPayload, PAYLOAD_SIZE))    // transmit & save the report
+            return false;
+    }
+    return true;
+}
+
+bool Radio::isAvailable() const
+{
+    if (m_nrf24 == nullptr) 
+    {
+        return false;
+    }
+    return m_nrf24->isChipConnected();
 }
