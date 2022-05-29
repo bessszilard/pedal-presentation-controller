@@ -6,7 +6,7 @@ The pedal presenter aims to control the computer or smartphone with pedals by em
 
 The device is mainly designed for musicians or presenters who would stop to change pages.
 
-![architecture.jpg](/home/szilard/git/pedal-presentation-controller/images/architecture.jpg)
+![architecture.jpg](./images/architecture.jpg)
 
 Figure 1. The high level architecture
 
@@ -16,17 +16,13 @@ The master module handles the two pedals, and broadcast the page number and the 
 
 With the right pedal is stands for the "next" and the left pedal for the "backward".
 
-![](/home/szilard/.config/marktext/images/2022-05-19-19-01-19-views.jpg)
+![](./images/views.jpg)
 
 Figure 2. Device views
 
 ## 2.1 Layouts
 
-![lcd_layouts.jpg](/home/szilard/git/pedal-presentation-controller/images/lcd_layouts.jpg)
-
-
-
-
+![lcd_layouts.jpg](./images/lcd_layouts.jpg)
 
 ## 2.2 Modes
 
@@ -50,7 +46,7 @@ Figure 2. Device views
 
 ## 2.4. Architecture
 
-![](/home/szilard/.config/marktext/images/2022-05-15-22-31-23-curcuit-layout.jpg)
+![](./images/curcuit-layout.jpg)
 
 ## 2.5 Wireless communication
 
@@ -60,13 +56,11 @@ The master sends 5 bytes to the slaves. First the start character, than the left
 | ------- | --- | -------- | --------- | ------ | ------ | -------- |
 | Content | "m" | Left key | Right Key | Page_H | Page_L | Checksum |
 
-## 
-
 ## 3.0 Slave module
 
 The slave modules are controlled via wireless communication. If the master sends the command, they comparing their local page counter with the received one, and they increase it by sending the left or right character. For example if the master sends page id 10, and the slave module page ID is 7, than it will send the character of the right pedal 3x times.
 
-![slave.jpg](/home/szilard/git/pedal-presentation-controller/images/slave.jpg)
+![slave.jpg](./images/slave.jpg)
 
 ### Appendix
 
@@ -92,6 +86,6 @@ The slave modules are controlled via wireless communication. If the master sends
 
 ## Peripherals
 
-![views.jpg](/home/szilard/git/pedal-presentation-controller/images/views.jpg)
+![views.jpg](./images/views.jpg)
 
-<img title="" src="file:///home/szilard/git/pedal-presentation-controller/images/LCD_default_layout.jpg" alt="LCD_default_layout.jpg" width="688">
+![LCD_default_layout](./images/LCD_default_layout.jpg)
