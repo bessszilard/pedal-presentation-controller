@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Vector.h>
 #include "Defines.h"
 
 struct SingleMode {

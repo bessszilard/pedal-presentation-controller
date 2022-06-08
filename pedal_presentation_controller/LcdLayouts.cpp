@@ -13,6 +13,9 @@ void LcdLayouts::init()
 
 void LcdLayouts::selectKeyBoardMode(const String& p_firstLine) 
 {
+    // 0 M:PG_DU  PG:1000  
+    // 1 W:OFF BT:PG_DW 
+
     m_lcd.clear();
     m_lcd.setCursor(0, 0);
     m_lcd.print(p_firstLine);

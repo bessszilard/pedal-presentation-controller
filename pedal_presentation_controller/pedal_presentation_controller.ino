@@ -36,6 +36,8 @@ void setup()
 {
 #if DEBUG
   Serial.begin(115200);
+#endif
+#if BLOCK_SERIAL
   while(!Serial) {}
 #endif
 
@@ -45,11 +47,18 @@ void setup()
   pedalLeft.configure(PEDAL_LEFT_PIN, BUTTON_LOGIC);
   pedalRight.configure(PEDAL_RIGHT_PIN, BUTTON_LOGIC);
   keyBoardMode.push_back(SingleMode{"Nothing", "Left", 0, "Right", 0, 0});  // default
-  keyBoardMode.push_back(SingleMode{"Arrows", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW, 1});
-  keyBoardMode.push_back(SingleMode{"Pg-UD", "Pg up", KEY_PAGE_UP, "Pg dw", KEY_PAGE_DOWN, 1});
+  keyBoardMode.push_back(SingleMode{"LR_1x", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW, 1});
+  keyBoardMode.push_back(SingleMode{"Pg_UD", "Pg up", KEY_PAGE_UP, "Pg dw", KEY_PAGE_DOWN, 1});
   keyBoardMode.push_back(SingleMode{"UD_7x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 7});
   keyBoardMode.push_back(SingleMode{"UD_8x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 8});
   keyBoardMode.push_back(SingleMode{"UD_9x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 9});
+
+  for(int startId = 20; startId < 31; startId++)
+  {
+    String lcdText = "UD_" + String(startId) + "x";
+    keyBoardMode.push_back(SingleMode{lcdText, "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, startId});
+  }
+
   lcdLayout.init();
   
   uint8_t wirEnFromMemory;
@@ -167,7 +176,7 @@ void loop()
     if (wirEn)
       radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentLeftKeyToString());
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError, keyBoardMode.currentLeftKeyToString());
     udpateDefaultL = false;
   }
 
@@ -178,7 +187,7 @@ void loop()
     if (wirEn)
       radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, keyBoardMode.currentRightKeyToString());
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError, keyBoardMode.currentRightKeyToString());
     udpateDefaultL = false;
   }
   if (pedalLeft.isJustReleased() || pedalRight.isJustReleased())
