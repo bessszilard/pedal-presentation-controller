@@ -53,7 +53,7 @@ void setup()
   keyBoardMode.push_back(SingleMode{"UD_8x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 8});
   keyBoardMode.push_back(SingleMode{"UD_9x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 9});
 
-  for(int startId = 20; startId < 31; startId++)
+  for(int startId = 10; startId < 31; startId++)
   {
     String lcdText = "UD_" + String(startId) + "x";
     keyBoardMode.push_back(SingleMode{lcdText, "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, startId});
