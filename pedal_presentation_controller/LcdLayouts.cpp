@@ -23,7 +23,7 @@ void LcdLayouts::selectKeyBoardMode(const String& p_firstLine)
     m_lcd.print("     ^^^^");
 }
 
-void LcdLayouts::defaultL(const String& p_mode, int p_pageId, bool p_wireless, bool p_wirelessError=false, const String& p_buttonText /*= ""*/)
+void LcdLayouts::defaultL(const String& p_mode, int p_pageId, bool p_wireless, bool p_wirelessError, StepMode p_stepMode, const String& p_buttonText /*= ""*/)
 {
     // 0 M:PG_DU  PG:1000  
     // 1 W:OFF BT:PG_DW 
@@ -34,7 +34,19 @@ void LcdLayouts::defaultL(const String& p_mode, int p_pageId, bool p_wireless, b
     {
         wirelessText = "ERR";
     }
-    String secondLine = "W:" + wirelessText + "  BT:" + p_buttonText;
+    String secondLine = "W:" + wirelessText + "   ";
+    if (p_buttonText.length() > 0)
+    {
+        secondLine += "BT:" + p_buttonText;
+    }
+    else
+    {
+        switch(p_stepMode)
+        {
+            case StepMode::Pdf:  secondLine += "Sm:Pdf";  break;
+            case StepMode::Word: secondLine += "Sm:Word"; break;
+        }
+    }
 
     m_lcd.clear();
     m_lcd.setCursor(0, 0);

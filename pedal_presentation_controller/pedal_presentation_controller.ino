@@ -3,7 +3,7 @@
 #include "KeyBoardMode.hpp"
 #include "LcdLayouts.hpp"
 #include "FeatureModes.hpp"
-#include "Defines.h"
+#include "DefinesAndEnums.h"
 #include "EepromStore.hpp"
 #include "Keyboard.h"
 #include "Radio.hpp"
@@ -31,6 +31,8 @@ static bool lastWirEn = false;      // Wireless enabled
 static bool wirError = false;      // Wireless error
 static uint8_t modeIndex = 0;
 static uint8_t FeatureModeIndex = 0;
+static uint8_t StepModeIndex = 0;
+static StepMode stepMode = StepMode::Pdf;
 
 void setup()
 {
@@ -53,7 +55,7 @@ void setup()
   keyBoardMode.push_back(SingleMode{"UD_8x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 8});
   keyBoardMode.push_back(SingleMode{"UD_9x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 9});
 
-  for(int startId = 10; startId < 31; startId++)
+  for(int startId = 10; startId < 35; startId++)
   {
     String lcdText = "UD_" + String(startId) + "x";
     keyBoardMode.push_back(SingleMode{lcdText, "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, startId});
@@ -62,10 +64,11 @@ void setup()
   lcdLayout.init();
   
   uint8_t wirEnFromMemory;
-  persistentMemory.loadConfig(modeIndex, wirEnFromMemory, FeatureModeIndex);
+  persistentMemory.loadConfig(modeIndex, wirEnFromMemory, FeatureModeIndex, StepModeIndex);
   keyBoardMode.selectMode(modeIndex);
   featureMode.selectMode(FeatureModeIndex);
   wirEn = wirEnFromMemory;
+  stepMode = (StepMode)StepModeIndex;
 
 #if DEBUG
   Serial.println("Loaded values from EEPROM");
@@ -120,7 +123,8 @@ void loop()
   if (featureEncButton.isPressed()) 
   {
     bool goBack = false;
-    featureMode.updateValues(wirEn, pageId, goBack);
+    featureMode.updateValues(wirEn, pageId, goBack, stepMode);
+    keyBoardMode.updateStepMode(stepMode);
 
     if (goBack)
     {
@@ -130,6 +134,7 @@ void loop()
 
     persistentMemory.storeWirelessMode((uint8_t)wirEn);
     persistentMemory.storeFeatureMode(featureMode.getCurrentModeIndex());
+    persistentMemory.storeStepMode((uint8_t)stepMode);
 #if DEBUG
   Serial.println("FeatureMode stored: " + String(featureMode.currentModeToString()));
 #endif
@@ -176,7 +181,7 @@ void loop()
     if (wirEn)
       radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError, keyBoardMode.currentLeftKeyToString());
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError, stepMode, keyBoardMode.currentLeftKeyToString());
     udpateDefaultL = false;
   }
 
@@ -187,7 +192,7 @@ void loop()
     if (wirEn)
       radio.sendMessage(keyBoardMode.currentLeftKey(), keyBoardMode.currentRightKey(), pageId);
 
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError, keyBoardMode.currentRightKeyToString());
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError, stepMode, keyBoardMode.currentRightKeyToString());
     udpateDefaultL = false;
   }
   if (pedalLeft.isJustReleased() || pedalRight.isJustReleased())
@@ -198,7 +203,7 @@ void loop()
   // Default layout -------------------------------------------
   if (udpateDefaultL) 
   {
-    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError);
+    lcdLayout.defaultL(keyBoardMode.currentModeToString(), pageId, wirEn, wirError, stepMode);
     udpateDefaultL = false;
   }
 }

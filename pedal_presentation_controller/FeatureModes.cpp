@@ -9,6 +9,8 @@ FeatureModes::FeatureModes() :
   push_back(FeatureMode {"Wir-On", FeatureActionEnum::WirelessOff});
   push_back(FeatureMode {"Rst-pgNum", FeatureActionEnum::ResetPageId});
   push_back(FeatureMode {"Rst+GoBack", FeatureActionEnum::ResetPageIdAndGoBack});
+  push_back(FeatureMode {"Pdf", FeatureActionEnum::SetPdfStepMode});
+  push_back(FeatureMode {"Word", FeatureActionEnum::SetWordStepMode});
 }
 
 void FeatureModes::push_back(FeatureMode p_newMode)
@@ -81,15 +83,17 @@ void FeatureModes::previoustMode()
   }
 }
 
-void FeatureModes::updateValues(bool& p_wirelessMode, int& p_pageId, bool& p_goBack)
+void FeatureModes::updateValues(bool& p_wirelessMode, int16_t& p_pageId, bool& p_goBack, StepMode& p_stepMode)
 {
   p_goBack = false;
   switch(m_modes[m_currentModeIndex].action)
   {
-    case FeatureActionEnum::WirelessOn:           p_wirelessMode = false;   break;
-    case FeatureActionEnum::WirelessOff:          p_wirelessMode = true;    break;
-    case FeatureActionEnum::ResetPageId:          p_pageId = 0;             break;
-    case FeatureActionEnum::ResetPageIdAndGoBack: p_goBack = true;          break;
+    case FeatureActionEnum::WirelessOn:           p_wirelessMode = false;              break;
+    case FeatureActionEnum::WirelessOff:          p_wirelessMode = true;               break;
+    case FeatureActionEnum::ResetPageId:          p_pageId = 0;                        break;
+    case FeatureActionEnum::ResetPageIdAndGoBack: p_goBack = true;                     break;
+    case FeatureActionEnum::SetPdfStepMode:   p_stepMode = StepMode::Pdf;  break;
+    case FeatureActionEnum::SetWordStepMode:  p_stepMode = StepMode::Word; break;
   }
 }
 

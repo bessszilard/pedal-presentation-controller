@@ -1,11 +1,11 @@
 #include <Arduino.h>
-#include "Defines.h"
+#include "DefinesAndEnums.h"
 
 struct SingleMode {
     String modeName;
-    String leftCharName;
+    char* leftCharName;
     int leftChar;
-    String rightCharName;
+    char* rightCharName;
     int rightChar;
     int sendMultipleTimes;
 };
@@ -29,6 +29,7 @@ public:
     void nextMode();
     void previoustMode();
     void goToStartPage(int16_t& p_pageId);
+    void updateStepMode(StepMode p_stepMode);
 
     inline int getCurrentModeIndex() const {
         return m_currentModeIndex;
@@ -39,5 +40,6 @@ private:
     int m_currentModeIndex;
     int m_minNameLength;
     int m_bufferIndex;
+    StepMode m_stepMode;
     SingleMode m_modes[MAX_NUMB_MODES];
 };

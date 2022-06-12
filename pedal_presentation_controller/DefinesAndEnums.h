@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 
 #define FEATURE_ENC_A_PIN 5
@@ -15,11 +16,19 @@
 
 #define BUTTON_LOGIC 0
 
-#define MAX_NUMB_MODES 30
+#define MAX_NUMB_MODES 35
 
 #define EEPROM_KEYBOARD_MODE_ADDRESS 1
 #define EEPROM_WIRE_MODE_ADDRESS 2
 #define EEPROM_FEATURE_OPTION_ADDRESS 3
+#define EEPROM_STEP_MODE_ADDRESS 4
 
 #define DEBUG 0
 #define BLOCK_SERIAL 0
+
+enum StepMode
+{
+    Pdf,
+    Word,
+    Count
+};

@@ -1,5 +1,5 @@
 #include<Arduino.h>
-#include "Defines.h"
+#include "DefinesAndEnums.h"
 
 enum class FeatureActionEnum 
 {
@@ -7,9 +7,10 @@ enum class FeatureActionEnum
     WirelessOff,
     ResetPageId,
     ResetPageIdAndGoBack,
+    SetPdfStepMode,
+    SetWordStepMode,
     Count
 };
-
 
 struct FeatureMode {
     String modeName;
@@ -25,7 +26,7 @@ public:
 
     void nextMode();
     void previoustMode();
-    void updateValues(bool& p_wirelessMode, int16_t& p_pageId, bool& p_goBack);
+    void updateValues(bool& p_wirelessMode, int16_t& p_pageId, bool& p_goBack, StepMode& p_stepMode);
     void selectMode(int p_modeIndex);
     int getCurrentModeIndex() {return m_currentModeIndex;}
 

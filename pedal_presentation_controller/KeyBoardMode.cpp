@@ -5,6 +5,7 @@ KeyBoardMode::KeyBoardMode() :
   m_currentModeIndex(0)
   , m_bufferIndex(0)
   , m_minNameLength(5)
+  , m_stepMode(StepMode::Pdf)
 {
 }
 
@@ -109,16 +110,45 @@ void KeyBoardMode::sendCurrentRightKey(int16_t& p_pageId)
 
 void KeyBoardMode::sendCurrentLeftKey(int16_t& p_pageId)
 {
-  for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+  switch(m_stepMode)
   {
-    Keyboard.press(m_modes[m_currentModeIndex].leftChar);
-    Keyboard.releaseAll();
-    p_pageId--;
-    if (p_pageId < 0)
-    {
-      p_pageId = 0;
-    }
+    case StepMode::Pdf:
+      for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+      {
+        Keyboard.press(m_modes[m_currentModeIndex].leftChar);
+        Keyboard.releaseAll();
+        p_pageId--;
+        if (p_pageId < 0)
+        {
+          p_pageId = 0;
+        }
+      }
+      break;
+    case StepMode::Word:
+      p_pageId -= m_modes[m_currentModeIndex].sendMultipleTimes;
+      if (p_pageId < 0)
+      {
+        p_pageId = 0;
+      }
+      // 3 steps back
+      for (int i = 0; i < 3 * m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+      {
+        Keyboard.press(m_modes[m_currentModeIndex].leftChar);
+        Keyboard.releaseAll();
+      }
+
+      if (p_pageId != 0)
+      {
+        // 2 forward
+        for (int i = 0; i < 2 * m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+        {
+          Keyboard.press(m_modes[m_currentModeIndex].rightChar);
+          Keyboard.releaseAll();
+        }
+      }
+      break;
   }
+
 }
 
 void KeyBoardMode::goToStartPage(int16_t& p_pageId)
@@ -155,4 +185,9 @@ void KeyBoardMode::previoustMode()
   {
     m_currentModeIndex = m_bufferIndex - 1;
   }
+}
+
+void KeyBoardMode::updateStepMode(StepMode p_stepMode)
+{
+  m_stepMode = p_stepMode;
 }
