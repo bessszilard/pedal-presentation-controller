@@ -26,6 +26,8 @@
 #define DEBUG 0
 #define BLOCK_SERIAL 0
 
+#define MOUSE_SCROLL 0x01
+
 enum StepMode
 {
     Pdf,

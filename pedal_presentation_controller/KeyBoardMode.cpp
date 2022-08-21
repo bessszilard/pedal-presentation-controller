@@ -1,4 +1,5 @@
 #include "Keyboard.h"
+#include "Mouse.h"
 #include "KeyBoardMode.hpp"
 
 KeyBoardMode::KeyBoardMode() : 
@@ -100,53 +101,67 @@ int KeyBoardMode::currentRightKey()
 
 void KeyBoardMode::sendCurrentRightKey(int16_t& p_pageId)
 {
-  for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
-  {
-    Keyboard.press(m_modes[m_currentModeIndex].rightChar);
-    Keyboard.releaseAll();
-    p_pageId++;
+  if (m_modes[m_currentModeIndex].rightChar == MOUSE_SCROLL) {
+    Mouse.move(0, 0, -m_modes[m_currentModeIndex].sendMultipleTimes);
+    Mouse.release();
+    p_pageId += m_modes[m_currentModeIndex].sendMultipleTimes;
+  }
+  else {
+    for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+    {
+      Keyboard.press(m_modes[m_currentModeIndex].rightChar);
+      Keyboard.releaseAll();
+      p_pageId++;
+    }
   }
 }
 
 void KeyBoardMode::sendCurrentLeftKey(int16_t& p_pageId)
 {
-  switch(m_stepMode)
-  {
-    case StepMode::Pdf:
-      for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
-      {
-        Keyboard.press(m_modes[m_currentModeIndex].leftChar);
-        Keyboard.releaseAll();
-        p_pageId--;
+  if (m_modes[m_currentModeIndex].rightChar == MOUSE_SCROLL) {
+    Mouse.move(0, 0, m_modes[m_currentModeIndex].sendMultipleTimes);
+    Mouse.release();
+    p_pageId -= m_modes[m_currentModeIndex].sendMultipleTimes;
+  }
+  else {
+    switch(m_stepMode)
+    {
+      case StepMode::Pdf:
+        for (int i = 0; i < m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+        {
+          Keyboard.press(m_modes[m_currentModeIndex].leftChar);
+          Keyboard.releaseAll();
+          p_pageId--;
+          if (p_pageId < 0)
+          {
+            p_pageId = 0;
+          }
+        }
+        break;
+      case StepMode::Word:
+        p_pageId -= m_modes[m_currentModeIndex].sendMultipleTimes;
         if (p_pageId < 0)
         {
           p_pageId = 0;
         }
-      }
-      break;
-    case StepMode::Word:
-      p_pageId -= m_modes[m_currentModeIndex].sendMultipleTimes;
-      if (p_pageId < 0)
-      {
-        p_pageId = 0;
-      }
-      // 3 steps back
-      for (int i = 0; i < 3 * m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
-      {
-        Keyboard.press(m_modes[m_currentModeIndex].leftChar);
-        Keyboard.releaseAll();
-      }
-
-      if (p_pageId != 0)
-      {
-        // 2 forward
-        for (int i = 0; i < 2 * m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+        // 3 steps back
+        for (int i = 0; i < 3 * m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
         {
-          Keyboard.press(m_modes[m_currentModeIndex].rightChar);
+          Keyboard.press(m_modes[m_currentModeIndex].leftChar);
           Keyboard.releaseAll();
         }
-      }
-      break;
+
+        if (p_pageId != 0)
+        {
+          // 2 forward
+          for (int i = 0; i < 2 * m_modes[m_currentModeIndex].sendMultipleTimes; ++i)
+          {
+            Keyboard.press(m_modes[m_currentModeIndex].rightChar);
+            Keyboard.releaseAll();
+          }
+        }
+        break;
+    }
   }
 
 }
@@ -160,11 +175,23 @@ void KeyBoardMode::goToStartPage(int16_t& p_pageId)
     return;
   }
 
-  while(p_pageId != 0)
-  {
-    Keyboard.press(m_modes[m_currentModeIndex].leftChar);
-    Keyboard.releaseAll();
-    p_pageId--;
+
+  if (m_modes[m_currentModeIndex].rightChar == MOUSE_SCROLL) {
+    int16_t scrollResolution = m_modes[m_currentModeIndex].sendMultipleTimes;
+    while(p_pageId > scrollResolution)
+    {
+      Mouse.move(0, 0, scrollResolution);
+      Mouse.release();
+      p_pageId -= scrollResolution;
+    }
+  }
+  else {
+    while(p_pageId > 0)
+    {
+      Keyboard.press(m_modes[m_currentModeIndex].leftChar);
+      Keyboard.releaseAll();
+      p_pageId--;
+    }
   }
 }
 

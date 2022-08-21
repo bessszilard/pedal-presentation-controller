@@ -51,14 +51,11 @@ void setup()
   keyBoardMode.push_back(SingleMode{"Nothing", "Left", 0, "Right", 0, 0});  // default
   keyBoardMode.push_back(SingleMode{"LR_1x", "Left", KEY_LEFT_ARROW, "Right", KEY_RIGHT_ARROW, 1});
   keyBoardMode.push_back(SingleMode{"Pg_UD", "Pg up", KEY_PAGE_UP, "Pg dw", KEY_PAGE_DOWN, 1});
-  keyBoardMode.push_back(SingleMode{"UD_7x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 7});
-  keyBoardMode.push_back(SingleMode{"UD_8x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 8});
-  keyBoardMode.push_back(SingleMode{"UD_9x", "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, 9});
 
-  for(int startId = 10; startId < 35; startId++)
+  for(int startId = 1; startId < 30; startId++)
   {
-    String lcdText = "UD_" + String(startId) + "x";
-    keyBoardMode.push_back(SingleMode{lcdText, "Up", KEY_UP_ARROW, "Down", KEY_DOWN_ARROW, startId});
+    String lcdText = "MS_" + String(startId) + "x";
+    keyBoardMode.push_back(SingleMode{lcdText, "Up", MOUSE_SCROLL, "Down", MOUSE_SCROLL, startId});
   }
 
   lcdLayout.init();

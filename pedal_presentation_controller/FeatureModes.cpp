@@ -88,12 +88,12 @@ void FeatureModes::updateValues(bool& p_wirelessMode, int16_t& p_pageId, bool& p
   p_goBack = false;
   switch(m_modes[m_currentModeIndex].action)
   {
-    case FeatureActionEnum::WirelessOn:           p_wirelessMode = false;              break;
-    case FeatureActionEnum::WirelessOff:          p_wirelessMode = true;               break;
-    case FeatureActionEnum::ResetPageId:          p_pageId = 0;                        break;
-    case FeatureActionEnum::ResetPageIdAndGoBack: p_goBack = true;                     break;
-    case FeatureActionEnum::SetPdfStepMode:   p_stepMode = StepMode::Pdf;  break;
-    case FeatureActionEnum::SetWordStepMode:  p_stepMode = StepMode::Word; break;
+    case FeatureActionEnum::WirelessOn:           p_wirelessMode = false;         break;
+    case FeatureActionEnum::WirelessOff:          p_wirelessMode = true;          break;
+    case FeatureActionEnum::ResetPageId:          p_pageId = 0;                   break;
+    case FeatureActionEnum::ResetPageIdAndGoBack: p_goBack = true;                break;
+    case FeatureActionEnum::SetPdfStepMode:       p_stepMode = StepMode::Pdf;     break;
+    case FeatureActionEnum::SetWordStepMode:      p_stepMode = StepMode::Word;    break;
   }
 }
 
